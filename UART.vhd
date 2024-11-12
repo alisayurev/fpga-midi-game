@@ -6,15 +6,15 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity UART is
     Port (
         clk          : in  STD_LOGIC;
-        reset        : in  STD_LOGIC;
-        tx_start     : in  STD_LOGIC;
-        tx_data      : in  STD_LOGIC_VECTOR(7 downto 0);
-        tx           : out STD_LOGIC;
-        tx_busy      : out STD_LOGIC;
+        reset        : in  STD_LOGIC; -- stops transmitting or receiving and resets internal signals
+        tx_start     : in  STD_LOGIC; -- initiates a transmission when set to '1'
+        tx_data      : in  STD_LOGIC_VECTOR(7 downto 0); -- data
+        tx           : out STD_LOGIC; -- serial output for transmitting data
+        tx_busy      : out STD_LOGIC; -- if set to '1', the transmitter is sending data
         
-        rx           : in  STD_LOGIC;
-        rx_data      : out STD_LOGIC_VECTOR(7 downto 0);
-        rx_ready     : out STD_LOGIC
+        rx           : in  STD_LOGIC; -- serial input for reading data
+        rx_data      : out STD_LOGIC_VECTOR(7 downto 0); -- holds the data byte
+        rx_ready     : out STD_LOGIC -- set to '1' once an entire byte has been read
     );
 end UART;
 
@@ -48,7 +48,7 @@ begin
                 tx_busy <= '0';
                 tx_active <= '0';
                 tx_counter <= 0;
-            elsif tx_start = '1' and tx_busy = '0' then
+            elsif tx_start = '1' and tx_busy = '0' then -- waits until ready
                 -- Load start bit, data, and stop bit
                 tx_shift_reg <= '0' & tx_data & '1'; -- Start bit, data, stop bit
                 tx_bit_index <= 0;
